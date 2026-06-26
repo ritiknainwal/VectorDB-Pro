@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<title>VectorDB Pro</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div class="logo-section">
+
+        <div class="logo-circle">🚀</div>
+
+        <div>
+
+            <h1>VectorDB Pro</h1>
+
+            <p>Semantic Search • HNSW • RAG • Ollama • FastAPI</p>
+
+        </div>
+
+    </div>
+
+    <div class="header-right">
+
+        <div class="status-pill">
+            <span class="status-dot"></span>
+            Connected
+        </div>
+
+        <div class="model-card">
+
+            <small>Embedding</small>
+            <strong>nomic-embed-text</strong>
+
+        </div>
+
+        <div class="model-card">
+
+            <small>LLM</small>
+            <strong>llama3.2</strong>
+
+        </div>
+
+    </div>
+
+</header>
+
+<section class="stats">
+
+<div class="card">
+
+<div class="card-icon">📦</div>
+
+<div>
+
+<h4>Total Vectors</h4>
+
+<h2 id="vectorCount">0</h2>
+
+<p>Stored embeddings</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="card-icon">📄</div>
+
+<div>
+
+<h4>Documents</h4>
+
+<h2 id="docCount">0</h2>
+
+<p>Indexed files</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="card-icon">⚡</div>
+
+<div>
+
+<h4>Latency</h4>
+
+<h2 id="latency">0 ms</h2>
+
+<p>Average search</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="card-icon">🧠</div>
+
+<div>
+
+<h4>Embedding</h4>
+
+<h2>768D</h2>
+
+<p>Vector dimension</p>
+
+</div>
+
+</div>
+
+</section>
+
+<div class="dashboard">
+    <aside class="left-panel">
+
+    <h2>📄 Documents</h2>
+
+    <input id="title" placeholder="Document title">
+
+    <textarea id="text" placeholder="Paste document..."></textarea>
+
+    <button id="insertBtn" onclick="insertDoc()">
+        ➕ Insert Document
+    </button>
+
+    <div class="divider"></div>
+
+    <h3>📚 Recent Documents</h3>
+
+    <div id="recentDocs">
+        <p class="empty-docs">No documents yet</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>📂 Import Documents</h3>
+
+    <input
+        type="file"
+        id="pdfFile"
+        accept=".pdf"
+        style="display:none"
+    >
+
+    <button
+        id="uploadPdfBtn"
+        onclick="document.getElementById('pdfFile').click()"
+    >
+        📂 Upload PDF
+    </button>
+
+    <button disabled>
+        📄 Upload DOCX
+    </button>
+
+    <button disabled>
+        📑 Upload TXT
+    </button>
+
+</aside>
+
+    <main class="center-panel">
+
+        <h2>🌌 Vector Space</h2>
+
+        <canvas
+            id="canvas"
+            width="850"
+            height="600">
+        </canvas>
+
+    </main>
+
+    <aside class="right-panel">
+
+        <h2>🤖 AI Assistant</h2>
+
+<p class="subtitle">
+
+Ask questions about your documents.
+
+</p>
+
+<input
+
+id="query"
+
+placeholder="Ask anything...">
+
+<button
+    id="askBtn"
+    class="btn-primary"
+    onclick="askAI()"
+>
+    ✨ Ask AI
+</button>
+
+<div id="results" class="results-container">
+
+    <div class="empty-results">
+        Search results will appear here
+    </div>
+
+</div>
+
+    </aside>
+
+</div>
+
+<script src="/static/pca.js"></script>
+<script src="/static/app.js"></script>
+
+<div id="toastContainer"></div>
+
+</body>
+
+</html>
