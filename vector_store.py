@@ -86,15 +86,20 @@ def index_pdf(pdf_path: str):
     chunks = chunk_text(text)
 
     filename = pdf_path.split("\\")[-1]
-
-    document_id = save_document(
-        filename,
-        filename
-    )
+    
+    document_id = save_document(filename, filename)
+    print("Document saved:", document_id)
+    
     for i, chunk in enumerate(chunks):
-        chunk_id = save_chunk(document_id,i + 1,chunk)
+        print(f"Saving chunk {i+1}")
+        
+        chunk_id = save_chunk(document_id, i + 1, chunk)
+        print("Chunk ID:", chunk_id)
+        
         embedding = get_embedding(chunk)
-        save_embedding(chunk_id,embedding)
+        save_embedding(chunk_id, embedding)
+        print("Embedding saved")
+        
         metadata = {
             "title": f"{filename} - Chunk {i+1}",
             "text": chunk
