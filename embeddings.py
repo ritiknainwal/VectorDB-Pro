@@ -1,14 +1,17 @@
-import ollama
+from sentence_transformers import SentenceTransformer
 
+print("Loading embedding model...")
 
-EMBED_MODEL = "nomic-embed-text"
+model = SentenceTransformer("BAAI/bge-base-en-v1.5")
+
+print("Embedding model loaded!")
 
 
 def get_embedding(text: str):
 
-    response = ollama.embeddings(
-        model=EMBED_MODEL,
-        prompt=text
+    embedding = model.encode(
+        text,
+        normalize_embeddings=True
     )
 
-    return response["embedding"]
+    return embedding.tolist()
