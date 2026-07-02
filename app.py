@@ -1,3 +1,9 @@
+import shutil
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -8,8 +14,7 @@ from vector_store import index_pdf
 from fastapi import UploadFile, File
 from database import *
 
-import shutil
-import os
+
 
 from vector_store import (
     add_document,
