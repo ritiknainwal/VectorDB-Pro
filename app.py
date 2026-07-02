@@ -81,7 +81,7 @@ def status():
         "vectors": total_vectors(),
         "documents": len(get_documents()),
         "dimensions": 768,
-        "model": "nomic-embed-text"
+        "model": "BAAI/bge-base-en-v1.5"
     }
 
 @app.get("/vectors")
