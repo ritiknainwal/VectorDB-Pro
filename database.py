@@ -189,3 +189,56 @@ def load_all_embeddings():
     db.close()
 
     return embeddings
+
+def document_exists(filename):
+
+    db = SessionLocal()
+
+    exists = (
+        db.query(Document)
+        .filter(Document.filename == filename)
+        .first()
+    )
+
+    db.close()
+
+    return exists
+
+from models import Document, Chunk, Embedding
+
+def delete_document(filename):
+
+    db = SessionLocal()
+
+    # Find the document
+    document = db.query(Document).filter(
+        Document.filename == filename
+    ).first()
+
+    if not document:
+        db.close()
+        return
+
+    # Find all chunks belonging to the document
+    chunks = db.query(Chunk).filter(
+        Chunk.document_id == document.id
+    ).all()
+
+    # Delete embeddings of each chunk
+    for chunk in chunks:
+
+        db.query(Embedding).filter(
+            Embedding.chunk_id == chunk.id
+        ).delete()
+
+    # Delete all chunks
+    db.query(Chunk).filter(
+        Chunk.document_id == document.id
+    ).delete()
+
+    # Delete document
+    db.delete(document)
+
+    db.commit()
+
+    db.close()

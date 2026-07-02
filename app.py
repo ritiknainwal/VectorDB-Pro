@@ -25,6 +25,9 @@ class AskRequest(BaseModel):
     question: str
     k: int = 3
 
+class DeleteRequest(BaseModel):
+    filename: str
+
 app = FastAPI(title="VectorDB Pro")
 
 init_db()
@@ -71,10 +74,10 @@ def ui():
 def status():
     return {
         "vectors": total_vectors(),
+        "documents": len(get_documents()),
         "dimensions": 768,
         "model": "nomic-embed-text"
     }
-
 
 @app.get("/vectors")
 def vectors():
@@ -104,16 +107,24 @@ def list_documents():
     for i, doc in enumerate(docs):
 
         result.append({
-
             "id": i,
-
             "title": doc["title"],
-
-            "text": doc["filename"]
-
+            "filename": doc["filename"]
         })
 
     return result
+
+@app.post("/delete_document")
+def delete_document_api(req: DeleteRequest):
+
+    delete_document(req.filename)
+
+    rebuild_index()
+
+    return {
+        "success": True,
+        "message": "Document deleted successfully."
+    }
 
 @app.post("/search")
 def search(req: SearchRequest):
@@ -226,8 +237,36 @@ def upload_pdf(file: UploadFile = File(...)):
 
     total_chunks = index_pdf(save_path)
 
+    if total_chunks == -1:
+        return {
+            "success": False,
+            "message": "Document already exists."
+            }
+
     return {
         "success": True,
         "filename": file.filename,
         "chunks": total_chunks
+    }
+
+class DeleteRequest(BaseModel):
+    filename: str
+
+
+@app.post("/delete_document")
+def delete_doc(req: DeleteRequest):
+
+    success = delete_document(req.filename)
+
+    if not success:
+        return {
+            "success": False,
+            "message": "Document not found."
+        }
+
+    rebuild_index()
+
+    return {
+        "success": True,
+        "message": "Document deleted successfully."
     }

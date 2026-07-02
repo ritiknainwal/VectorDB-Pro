@@ -12,7 +12,8 @@ from database import (
     save_embedding,
     load_documents,
     load_all_chunks,
-    load_all_embeddings
+    load_all_embeddings,
+    document_exists
 )
 
 # Create one global HNSW database
@@ -75,6 +76,11 @@ def get_documents():
 
 def index_pdf(pdf_path: str):
 
+    filename = os.path.basename(pdf_path)
+    
+    if document_exists(filename):
+        return -1
+
     text = load_pdf(pdf_path)
 
     chunks = chunk_text(text)
@@ -85,36 +91,32 @@ def index_pdf(pdf_path: str):
         filename,
         filename
     )
-
     for i, chunk in enumerate(chunks):
-        chunk_id = save_chunk(
-        document_id,
-        i + 1,
-        chunk
-    )
-
-    embedding = get_embedding(chunk)
-
-    save_embedding(
-        chunk_id,
-        embedding
-    )
-
-    metadata = {
-        "title": f"{filename} - Chunk {i+1}",
-        "text": chunk
-    }
-
-    db.insert(
+        chunk_id = save_chunk(document_id,i + 1,chunk)
+        embedding = get_embedding(chunk)
+        save_embedding(chunk_id,embedding)
+        metadata = {
+            "title": f"{filename} - Chunk {i+1}",
+            "text": chunk
+            }
+        db.insert(
         embedding,
         metadata
-    )
-
+        )
+    return len(chunks)
 
 def rebuild_index():
 
+    global db
+
+    # Create a fresh empty HNSW index
+    db = HNSWVectorDB(dim=768)
+
     chunks = load_all_chunks()
     embeddings = load_all_embeddings()
+
+    print(f"Chunks: {len(chunks)}")
+    print(f"Embeddings: {len(embeddings)}")
 
     print(f"Loading {len(chunks)} chunks from PostgreSQL...")
 

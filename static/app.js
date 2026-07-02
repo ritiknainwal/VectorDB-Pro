@@ -71,11 +71,15 @@ function animateCounter(id, endValue, duration = 800) {
 async function loadStatus() {
 
     const r = await fetch(API + "/status");
-
     const d = await r.json();
 
-    animateCounter("vectorCount",d.vectors);
-    animateCounter("docCount",d.vectors);
+    animateCounter("vectorCount", d.vectors);
+
+    const docs = await fetch(API + "/list");
+    const documents = await docs.json();
+
+    animateCounter("docCount", documents.length);
+
     document.getElementById("latency").textContent = "0 ms";
 }
 
@@ -383,10 +387,17 @@ async function uploadPDF(event) {
 
         const data = await response.json();
 
+        if (!data.success) {
+            showToast("⚠️ " + data.message, "error");
+            btn.innerHTML = "📂 Upload PDF";
+            btn.disabled = false;
+            return;
+        }
+
         btn.innerHTML = `✅ ${data.chunks} Chunks Indexed`;
 
         showToast(
-            `✅ ${data.filename} uploaded successfully`,
+            `${data.filename} uploaded successfully`,
             "success"
         );
 
@@ -435,23 +446,29 @@ async function loadRecentDocs(){
 
     }
 
-    let html="";
+    let html = "";
 
-    docs.reverse().forEach(doc=>{
+    docs.reverse().forEach(doc => {
 
-        html+=`
-
+        html += `
         <div class="doc-item">
 
-            🟢 ${doc.title}
+            <span>🟢 ${doc.title}</span>
+
+            <button
+                class="delete-btn"
+                onclick="deleteDocument('${doc.filename}')">
+
+                🗑
+
+            </button>
 
         </div>
-
         `;
 
     });
 
-    container.innerHTML=html;
+    container.innerHTML = html;
 
 }
 
@@ -463,3 +480,80 @@ document
 .getElementById("pdfFile")
 .addEventListener("change", uploadPDF);
 
+async function deleteDocument(filename){
+
+    if(!confirm(`Delete ${filename}?`)){
+        return;
+    }
+
+    const r = await fetch(API + "/delete_document",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            filename:filename
+        })
+
+    });
+
+    const data = await r.json();
+
+    showToast(data.message,"success");
+
+    loadStatus();
+    loadRecentDocs();
+    drawVectors();
+
+}
+
+async function drawVectors() {
+
+    const response = await fetch(API + "/points");
+
+    const points = await response.json();
+
+    const canvas = document.getElementById("vectorCanvas");
+
+    if (!canvas)
+        return;
+
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw center axes
+    ctx.strokeStyle = "#334155";
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.stroke();
+
+    points.forEach(point => {
+
+        const x = canvas.width / 2 + point.x;
+        const y = canvas.height / 2 - point.y;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = "#38bdf8";
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "14px Arial";
+        ctx.fillText(point.title, x + 10, y - 10);
+
+    });
+
+}

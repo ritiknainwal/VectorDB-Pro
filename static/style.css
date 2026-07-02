@@ -753,3 +753,47 @@ button:disabled{
     cursor:not-allowed;
 
 }
+
+.doc-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:10px;
+    margin-bottom:10px;
+
+    background:#1b2745;
+    border-radius:8px;
+}
+
+.doc-item span{
+    flex:1;
+    color:white;
+    font-size:14px;
+    word-break:break-word;
+}
+
+.delete-btn{
+    margin-left:10px;
+
+    width:32px;
+    height:32px;
+
+    border:none;
+    border-radius:6px;
+
+    cursor:pointer;
+
+    background:#ff4d4f;
+    color:white;
+
+    font-size:16px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.delete-btn:hover{
+    background:#ff7875;
+}

@@ -1,26 +1,46 @@
-import ollama
+import os
+
+from dotenv import load_dotenv
+from groq import Groq
+
+load_dotenv()
+
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
+)
+
+MODEL = os.getenv(
+    "MODEL_NAME",
+    "llama-3.3-70b-versatile"
+)
+
 
 def generate_answer(question, context):
 
     prompt = f"""
-    Answer the question using ONLY the context below.
+You are an AI assistant.
 
-    Context:
-    {context}
+Answer ONLY using the provided context.
 
-    Question:
-    {question}
-    """
+If the answer is not found in the context, say:
+"I couldn't find that information in the uploaded documents."
 
-    response = ollama.chat(
-        model="llama3.2",
+Context:
+{context}
+
+Question:
+{question}
+"""
+
+    response = client.chat.completions.create(
+        model=MODEL,
         messages=[
             {
                 "role": "user",
                 "content": prompt
             }
-        ]
+        ],
+        temperature=0.2
     )
 
-    return response["message"]["content"]
-
+    return response.choices[0].message.content
